@@ -37,8 +37,19 @@
         const resp = await fetch('/api/auth/login', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ email, password })
+            body: JSON.stringify({ email, password }),
+            redirect: 'manual'
         });
+
+        if (resp.ok) {
+            window.location.href = '/';
+        } else if (resp.status === 401) {
+            document.getElementById('status').textContent = 'Verkeerd email of wachtwoord.';
+        } else if (resp.status === 429) {
+            document.getElementById('status').textContent = 'Te veel pogingen. Wacht 1 minuut.';
+        } else {
+            document.getElementById('status').textContent = `Login mislukt (status ${resp.status}).`;
+        }
 
         if (resp.ok) {
             window.location.href = '/';

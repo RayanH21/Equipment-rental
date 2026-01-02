@@ -27,6 +27,7 @@
         <a href="/cart">Mandje</a>
         <a href="/login">Login</a>
         <a href="/register">Registreren</a>
+        <a href="#" id="logoutLink">Logout</a>
     </div>
 </header>
 
@@ -44,6 +45,19 @@
 <div id="products" class="row"></div>
 
 <script>
+    const logoutLink = document.getElementById('logoutLink');
+    if (logoutLink) {
+        logoutLink.addEventListener('click', async (e) => {
+            e.preventDefault();
+
+            await fetch('/api/auth/logout', {
+                method: 'POST'
+            });
+
+            window.location.href = '/login';
+        });
+    }
+
     async function loadProducts() {
         const cat = document.getElementById('category').value;
         const url = cat ? `/api/products?category=${encodeURIComponent(cat)}` : '/api/products';
