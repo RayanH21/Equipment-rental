@@ -31,43 +31,35 @@
     </div>
 </header>
 
-<section style="margin-top:18px;">
-    <label for="category">Filter categorie</label>
-    <select id="category">
-        <option value="">Alle categorieën</option>
-        <option value="Belichting">Belichting</option>
-        <option value="Kabels">Kabels</option>
-        <option value="Controlepanelen">Controlepanelen</option>
-        <option value="Podiumelementen">Podiumelementen</option>
-    </select>
+<section style="margin-top:18px; display:flex; gap:12px; flex-wrap:wrap;">
+    <div style="min-width:260px; flex:1;">
+        <label for="search">Zoeken</label>
+        <input id="search" type="text" placeholder="Zoek op naam, beschrijving, categorie..." />
+    </div>
+
+    <div style="min-width:220px;">
+        <label for="category">Filter categorie</label>
+        <select id="category">
+            <option value="">Alle categorieën</option>
+            <option value="Belichting">Belichting</option>
+            <option value="Kabels">Kabels</option>
+            <option value="Controlepanelen">Controlepanelen</option>
+            <option value="Podiumelementen">Podiumelementen</option>
+        </select>
+    </div>
 </section>
 
 <div id="products" class="row"></div>
 
+
 <script>
-    const logoutLink = document.getElementById('logoutLink');
-    if (logoutLink) {
-        logoutLink.addEventListener('click', async (e) => {
-            e.preventDefault();
+    let allProducts = [];
 
-            await fetch('/api/auth/logout', {
-                method: 'POST'
-            });
-
-            window.location.href = '/login';
-        });
-    }
-
-    async function loadProducts() {
-        const cat = document.getElementById('category').value;
-        const url = cat ? `/api/products?category=${encodeURIComponent(cat)}` : '/api/products';
-        const res = await fetch(url);
-        const data = await res.json();
-
+    function renderProducts(list) {
         const el = document.getElementById('products');
         el.innerHTML = '';
 
-        data.forEach(p => {
+        list.forEach(p => {
             const card = document.createElement('div');
             card.className = 'card';
             card.innerHTML = `
@@ -120,8 +112,46 @@
         });
     }
 
-    document.getElementById('category').addEventListener('change', loadProducts);
+    function applyFilters() {
+        const cat = document.getElementById('category').value.trim().toLowerCase();
+        const q = document.getElementById('search').value.trim().toLowerCase();
+
+        let filtered = allProducts;
+
+        if (cat) {
+            filtered = filtered.filter(p => (p.category?.name ?? '').toLowerCase() === cat);
+        }
+
+        if (q) {
+            filtered = filtered.filter(p => {
+                const name = (p.name ?? '').toLowerCase();
+                const desc = (p.description ?? '').toLowerCase();
+                const category = (p.category?.name ?? '').toLowerCase();
+                return name.includes(q) || desc.includes(q) || category.includes(q);
+            });
+        }
+
+        renderProducts(filtered);
+    }
+
+    async function loadProducts() {
+        // We halen alles op één keer op en filteren client-side
+        const res = await fetch('/api/products');
+        allProducts = await res.json();
+        applyFilters();
+    }
+
+    document.getElementById('category').addEventListener('change', applyFilters);
+
+    // live zoeken met kleine debounce
+    let t = null;
+    document.getElementById('search').addEventListener('input', () => {
+        clearTimeout(t);
+        t = setTimeout(applyFilters, 150);
+    });
+
     loadProducts();
 </script>
+
 </body>
 </html>
