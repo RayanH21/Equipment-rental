@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="nl">
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <title>Registreren - Equipment Rental</title>
+    <style>
+        body { font-family: system-ui, Arial; margin: 24px; }
+        .box { border:1px solid #ddd; border-radius:12px; padding:16px; max-width:420px; }
+        label { display:block; margin-top:10px; }
+        input { width:100%; padding:10px; }
+        button { padding:10px 12px; margin-top:12px; cursor:pointer; }
+        .muted { color:#666; font-size:12px; }
+    </style>
+</head>
+<body>
+<h2>Registreren</h2>
+
+<div class="box">
+    <label>Email</label>
+    <input id="email" type="email" placeholder="student@school.be"/>
+
+    <label>Wachtwoord</label>
+    <input id="password" type="password" placeholder="min. 8 tekens"/>
+
+    <button id="registerBtn">Account aanmaken</button>
+    <div class="muted" id="status"></div>
+
+    <p class="muted">Heb je al een account? <a href="/login">Login</a></p>
+</div>
+
+<script>
+    document.getElementById('registerBtn').addEventListener('click', async () => {
+        const email = document.getElementById('email').value;
+        const password = document.getElementById('password').value;
+
+        const resp = await fetch('/api/auth/register', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email, password })
+        });
+
+        if (resp.ok) {
+            document.getElementById('status').textContent = 'Account aangemaakt. Je kan nu inloggen.';
+        } else {
+            const txt = await resp.text();
+            document.getElementById('status').textContent = 'Fout: ' + txt;
+        }
+    });
+</script>
+</body>
+</html>

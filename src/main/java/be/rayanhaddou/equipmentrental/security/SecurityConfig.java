@@ -17,12 +17,23 @@ public class SecurityConfig {
         http
                 .csrf(csrf -> csrf.disable()) // handig voor REST/POC
                 .authorizeHttpRequests(auth -> auth
+                        .requestMatchers("/", "/login", "/register", "/css/**", "/js/**").permitAll()
                         .requestMatchers("/api/auth/**").permitAll()
-                        .requestMatchers("/api/products/**").permitAll()   // catalogus publiek (POC-vriendelijk)
+                        .requestMatchers("/api/products/**").permitAll()
                         .requestMatchers("/h2-console/**").permitAll()
+                        .requestMatchers("/cart", "/checkout", "/api/cart/**").authenticated()
                         .anyRequest().authenticated()
                 )
-                .headers(headers -> headers.frameOptions(frame -> frame.disable())); // nodig voor H2 console
+                .headers(headers -> headers.frameOptions(frame -> frame.disable()))
+                .formLogin(form -> form
+                        .loginPage("/login")
+                        .defaultSuccessUrl("/", true)
+                        .permitAll()
+                )
+                .logout(logout -> logout
+                        .logoutUrl("/logout")
+                        .logoutSuccessUrl("/")
+                );
 
         return http.build();
     }

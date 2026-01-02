@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="nl">
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <title>Catalogus - Equipment Rental</title>
+    <style>
+        body { font-family: system-ui, Arial; margin: 24px; }
+        header { display:flex; gap:12px; align-items:center; justify-content:space-between; }
+        .row { display:flex; gap:12px; flex-wrap:wrap; margin-top:16px; }
+        .card { border:1px solid #ddd; border-radius:12px; padding:12px; width: 320px; }
+        label { display:block; font-size: 12px; margin-top:8px; }
+        input, select { width:100%; padding:8px; }
+        button { padding:10px 12px; margin-top:10px; cursor:pointer; }
+        .toplinks a { margin-left:10px; }
+        .muted { color:#666; font-size:12px; }
+    </style>
+</head>
+<body>
+<header>
+    <div>
+        <h2>Equipment Rental</h2>
+        <div class="muted">Proof of concept uitleenplatform</div>
+    </div>
+    <div class="toplinks">
+        <a href="/">Catalogus</a>
+        <a href="/cart">Mandje</a>
+        <a href="/login">Login</a>
+        <a href="/register">Registreren</a>
+    </div>
+</header>
+
+<section style="margin-top:18px;">
+    <label for="category">Filter categorie</label>
+    <select id="category">
+        <option value="">Alle categorieën</option>
+        <option value="Belichting">Belichting</option>
+        <option value="Kabels">Kabels</option>
+        <option value="Controlepanelen">Controlepanelen</option>
+        <option value="Podiumelementen">Podiumelementen</option>
+    </select>
+</section>
+
+<div id="products" class="row"></div>
+
+<script>
+    async function loadProducts() {
+        const cat = document.getElementById('category').value;
+        const url = cat ? `/api/products?category=${encodeURIComponent(cat)}` : '/api/products';
+        const res = await fetch(url);
+        const data = await res.json();
+
+        const el = document.getElementById('products');
+        el.innerHTML = '';
+
+        data.forEach(p => {
+            const card = document.createElement('div');
+            card.className = 'card';
+            card.innerHTML = `
+        <h3>${p.name}</h3>
+        <div class="muted">${p.category?.name ?? ''}</div>
+        <p>${p.description ?? ''}</p>
+        <div><b>Beschikbaar:</b> ${p.quantity}</div>
+
+        <label>Van datum</label>
+        <input type="date" class="fromDate"/>
+
+        <label>Tot datum</label>
+        <input type="date" class="toDate"/>
+
+        <label>Aantal</label>
+        <input type="number" min="1" value="1" class="qty"/>
+
+        <button class="addBtn">Toevoegen aan mandje</button>
+        <div class="muted status"></div>
+      `;
+
+            card.querySelector('.addBtn').addEventListener('click', async () => {
+                const fromDate = card.querySelector('.fromDate').value;
+                const toDate = card.querySelector('.toDate').value;
+                const quantity = parseInt(card.querySelector('.qty').value, 10);
+
+                if (!fromDate || !toDate) {
+                    card.querySelector('.status').textContent = 'Kies een van- en tot-datum.';
+                    return;
+                }
+
+                const payload = { productId: p.id, quantity, fromDate, toDate };
+                const resp = await fetch('/api/cart/items', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                if (resp.ok) {
+                    card.querySelector('.status').textContent = 'Toegevoegd! Ga naar mandje.';
+                } else if (resp.status === 403) {
+                    card.querySelector('.status').textContent = 'Je moet eerst inloggen om te reserveren.';
+                } else {
+                    const txt = await resp.text();
+                    card.querySelector('.status').textContent = 'Fout: ' + txt;
+                }
+            });
+
+            el.appendChild(card);
+        });
+    }
+
+    document.getElementById('category').addEventListener('change', loadProducts);
+    loadProducts();
+</script>
+</body>
+</html>
