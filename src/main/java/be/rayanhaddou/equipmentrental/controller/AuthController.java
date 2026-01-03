@@ -54,8 +54,11 @@ public class AuthController {
 
         try {
             Authentication auth = authenticationManager.authenticate(
-                    new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword())
+                    new UsernamePasswordAuthenticationToken(email, request.getPassword())
             );
+
+            // ✅ voorkomt session fixation
+            httpRequest.changeSessionId();
 
             SecurityContextHolder.getContext().setAuthentication(auth);
             httpRequest.getSession(true).setAttribute(

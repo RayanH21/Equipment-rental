@@ -30,4 +30,9 @@ public class PageController {
     public String register() {
         return "register";
     }
+
+    @GetMapping("/rentals")
+    public String rentals() {
+        return "rentals";
+    }
 }
