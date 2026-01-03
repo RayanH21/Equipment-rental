@@ -2,6 +2,7 @@ package be.rayanhaddou.equipmentrental.service;
 
 import be.rayanhaddou.equipmentrental.dto.AddToCartRequest;
 import be.rayanhaddou.equipmentrental.model.CartItem;
+import be.rayanhaddou.equipmentrental.repository.ProductRepository;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.stereotype.Service;
 
@@ -14,18 +15,31 @@ public class CartService {
     private static final String CART_KEY = "CART";
 
     private final ReservationService reservationService;
+    private final ProductRepository productRepository;
 
-    public CartService(ReservationService reservationService) {
+    public CartService(ReservationService reservationService, ProductRepository productRepository) {
         this.reservationService = reservationService;
+        this.productRepository = productRepository;
     }
 
     // ➕ item toevoegen aan cart
     public void addToCart(AddToCartRequest request, HttpSession session) {
         List<CartItem> cart = getCart(session);
 
+        var product = productRepository.findById(request.getProductId())
+                .orElseThrow(() -> new IllegalArgumentException("Product not found"));
+
+        if (!product.isActive()) {
+            throw new IllegalArgumentException("Product is not available");
+        }
+
+        if (request.getQuantity() > product.getQuantity()) {
+            throw new IllegalArgumentException("Not enough stock");
+        }
+
         CartItem item = new CartItem(
                 request.getProductId(),
-                null, // productName vullen we later (of laten we leeg)
+                product.getName(), // ✅ nu gevuld
                 request.getQuantity(),
                 request.getFromDate(),
                 request.getToDate()
@@ -48,7 +62,6 @@ public class CartService {
             return;
         }
 
-        // 🔥 HIER gebeurt het echte werk
         reservationService.checkout(cart);
 
         // 🧹 cart leegmaken

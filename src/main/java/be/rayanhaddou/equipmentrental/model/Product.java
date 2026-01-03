@@ -1,6 +1,7 @@
 package be.rayanhaddou.equipmentrental.model;
 
 import jakarta.persistence.*;
+import jakarta.persistence.Version;
 
 @Entity
 @Table(name = "products")
@@ -9,6 +10,9 @@ public class Product {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @Version
+    private long version;
 
     @Column(nullable = false, length = 120)
     private String name;
