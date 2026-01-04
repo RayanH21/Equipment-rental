@@ -25,7 +25,7 @@ public class SecurityConfig {
                 )
                 .authorizeHttpRequests(auth -> auth
                         // pages + static
-                        .requestMatchers("/", "/login", "/register", "/css/**", "/js/**").permitAll()
+                        .requestMatchers("/", "/catalog", "/login", "/register", "/css/**", "/js/**").permitAll()
 
                         .requestMatchers("/api/csrf").permitAll()
 

@@ -1,0 +1,494 @@
+<!doctype html>
+<html lang="nl"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <title>Equipment Rental – POC</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Optioneel: icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+</head>
+
+<body class="bg-light">
+
+<div th:replace="fragments/navbar :: navbar"></div>
+
+<!-- HERO -->
+<header class="py-5 border-bottom" style="
+    background:
+      radial-gradient(900px circle at 10% 10%, rgba(13,110,253,.18), transparent 55%),
+      radial-gradient(700px circle at 90% 20%, rgba(25,135,84,.14), transparent 50%),
+      linear-gradient(180deg, #ffffff 0%, #f8f9fa 100%);
+">
+    <div class="container py-3">
+        <div class="row align-items-center g-4">
+            <div class="col-lg-7">
+                <div class="d-inline-flex align-items-center gap-2 mb-3">
+                    <span class="badge text-bg-dark">Proof of Concept</span>
+                    <span class="badge text-bg-light border text-muted">Spring Boot • Security • Thymeleaf</span>
+                </div>
+
+                <h1 class="display-5 fw-bold mb-3">
+                    Reserveer materiaal <span class="text-primary">snel</span> en <span class="text-success">veilig</span>
+                </h1>
+
+                <p class="lead text-muted mb-4">
+                    Equipment Rental is een POC voor een uitleenplatform binnen een kunstopleiding.
+                    Browse de catalogus, voeg items toe aan je mandje en bevestig je reservatie.
+                </p>
+
+                <div class="d-flex gap-2 flex-wrap">
+                    <a href="/catalog" class="btn btn-primary btn-lg">
+                        <i class="bi bi-grid-3x3-gap me-2"></i>Bekijk catalogus
+                    </a>
+
+                    <span sec:authorize="isAnonymous()">
+                        <a href="/login" class="btn btn-outline-secondary btn-lg">
+                            <i class="bi bi-box-arrow-in-right me-2"></i>Login
+                        </a>
+                        <a href="/register" class="btn btn-success btn-lg">
+                            <i class="bi bi-person-plus me-2"></i>Registreren
+                        </a>
+                    </span>
+
+                    <span sec:authorize="isAuthenticated()">
+                        <a href="/cart" class="btn btn-outline-secondary btn-lg">
+                            <i class="bi bi-bag me-2"></i>Mandje
+                        </a>
+                        <a href="/rentals" class="btn btn-outline-secondary btn-lg">
+                            <i class="bi bi-receipt me-2"></i>Mijn leningen
+                        </a>
+                    </span>
+                </div>
+
+                <div class="mt-3 text-muted small">
+                    <i class="bi bi-shield-lock me-1"></i>
+                    Session-based auth + CSRF cookie token + rate limiting op login.
+                </div>
+            </div>
+
+            <div class="col-lg-5">
+                <div class="card shadow-sm border-0">
+                    <div class="card-body p-4">
+                        <div class="d-flex align-items-center justify-content-between mb-2">
+                            <div class="fw-semibold">Snel overzicht</div>
+                            <span class="badge rounded-pill text-bg-primary">POC</span>
+                        </div>
+
+                        <div class="row g-3 mt-1">
+                            <div class="col-6">
+                                <div class="p-3 rounded-3 bg-light border h-100">
+                                    <div class="fw-semibold">Catalogus</div>
+                                    <div class="text-muted small">Zoek & filter op categorie.</div>
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="p-3 rounded-3 bg-light border h-100">
+                                    <div class="fw-semibold">Mandje</div>
+                                    <div class="text-muted small">Sessie-based winkelmandje.</div>
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="p-3 rounded-3 bg-light border h-100">
+                                    <div class="fw-semibold">Checkout</div>
+                                    <div class="text-muted small">Maakt reservaties + stock update.</div>
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="p-3 rounded-3 bg-light border h-100">
+                                    <div class="fw-semibold">Annuleren</div>
+                                    <div class="text-muted small">Status + stock herstel.</div>
+                                </div>
+                            </div>
+                        </div>
+                     </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</header>
+
+<!-- SECTIE: HOE WERKT HET -->
+<section class="py-5">
+    <div class="container">
+        <div class="row align-items-end g-3 mb-3">
+            <div class="col-lg-8">
+                <h2 class="fw-bold mb-1">Hoe werkt het?</h2>
+                <div class="text-muted">Een eenvoudige flow die je meteen kan demonstreren.</div>
+            </div>
+            <div class="col-lg-4 text-lg-end">
+                <a href="/catalog" class="btn btn-outline-primary">
+                    <i class="bi bi-arrow-right-circle me-2"></i>Start in de catalogus
+                </a>
+            </div>
+        </div>
+
+        <div class="row g-3">
+            <div class="col-md-6 col-lg-3">
+                <div class="card h-100 shadow-sm">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <span class="badge text-bg-primary">Stap 1</span>
+                            <i class="bi bi-search fs-4 text-primary"></i>
+                        </div>
+                        <div class="fw-semibold mt-2">Browse & filter</div>
+                        <div class="text-muted small">
+                            Zoek op naam/omschrijving en filter op categorie.
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-6 col-lg-3">
+                <div class="card h-100 shadow-sm">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <span class="badge text-bg-primary">Stap 2</span>
+                            <i class="bi bi-calendar2-week fs-4 text-primary"></i>
+                        </div>
+                        <div class="fw-semibold mt-2">Kies datum & aantal</div>
+                        <div class="text-muted small">
+                            Selecteer van/tot datum en gewenste hoeveelheid.
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-6 col-lg-3">
+                <div class="card h-100 shadow-sm">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <span class="badge text-bg-primary">Stap 3</span>
+                            <i class="bi bi-bag-check fs-4 text-primary"></i>
+                        </div>
+                        <div class="fw-semibold mt-2">Mandje & checkout</div>
+                        <div class="text-muted small">
+                            Bevestig (POC): mandje wordt geleegd na checkout.
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-6 col-lg-3">
+                <div class="card h-100 shadow-sm">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <span class="badge text-bg-primary">Stap 4</span>
+                            <i class="bi bi-receipt-cutoff fs-4 text-primary"></i>
+                        </div>
+                        <div class="fw-semibold mt-2">Mijn leningen</div>
+                        <div class="text-muted small">
+                            Bekijk actief + annuleer (status + stock herstel).
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- SECTIE: FEATURES -->
+<section class="py-5 bg-white border-top border-bottom">
+    <div class="container">
+        <div class="row g-4 align-items-center">
+            <div class="col-lg-5">
+                <h2 class="fw-bold mb-2">Wat zit er in deze POC?</h2>
+                <p class="text-muted mb-4">
+                    Focus op de rubriek: data tonen/filteren, login/registratie, sessie, checkout en security.
+                </p>
+
+                <div class="d-flex gap-2 flex-wrap">
+                    <span class="badge text-bg-light border"><i class="bi bi-shield-lock me-1"></i>CSRF cookie token</span>
+                    <span class="badge text-bg-light border"><i class="bi bi-person-check me-1"></i>Session auth</span>
+                    <span class="badge text-bg-light border"><i class="bi bi-speedometer me-1"></i>Rate limiting</span>
+                    <span class="badge text-bg-light border"><i class="bi bi-database-check me-1"></i>JPA + H2</span>
+                </div>
+            </div>
+
+            <div class="col-lg-7">
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <div class="card h-100 shadow-sm">
+                            <div class="card-body">
+                                <div class="fw-semibold mb-1"><i class="bi bi-person-lock me-2"></i>Auth & security</div>
+                                <div class="text-muted small">
+                                    BCrypt hashing, CSRF bescherming en login rate limiting.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="card h-100 shadow-sm">
+                            <div class="card-body">
+                                <div class="fw-semibold mb-1"><i class="bi bi-funnel me-2"></i>Overzicht & filtering</div>
+                                <div class="text-muted small">
+                                    Catalogus met zoekveld + categorie-filter.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="card h-100 shadow-sm">
+                            <div class="card-body">
+                                <div class="fw-semibold mb-1"><i class="bi bi-bag me-2"></i>Sessie mandje</div>
+                                <div class="text-muted small">
+                                    Mandje in HttpSession (simpel en ideaal voor POC).
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="card h-100 shadow-sm">
+                            <div class="card-body">
+                                <div class="fw-semibold mb-1"><i class="bi bi-arrow-repeat me-2"></i>Transacties</div>
+                                <div class="text-muted small">
+                                    Checkout/cancel met transactionele consistentie (stock + status).
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="alert alert-light border mt-3 mb-0">
+                    <div class="d-flex gap-3 align-items-start">
+                        <i class="bi bi-info-circle text-primary fs-5"></i>
+                        <div class="small text-muted">
+                            <span class="fw-semibold text-dark">Tip voor je demo:</span>
+                            toon na checkout in “Mijn leningen” hoe een annulering de stock terug verhoogt.
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- SECTIE: CATEGORIEËN -->
+<section class="py-5">
+    <div class="container">
+        <div class="row g-3 align-items-end mb-3">
+            <div class="col-lg-8">
+                <h2 class="fw-bold mb-1">Categorieën</h2>
+                <div class="text-muted">Gebaseerd op je seed data: ideaal om snel te tonen in de catalogus.</div>
+            </div>
+            <div class="col-lg-4 text-lg-end">
+                <a class="btn btn-outline-secondary" href="/catalog">
+                    <i class="bi bi-grid me-2"></i>Alle producten
+                </a>
+            </div>
+        </div>
+
+        <div class="row g-3">
+            <div class="col-md-6 col-lg-3">
+                <div class="card shadow-sm h-100">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between">
+                            <div class="fw-semibold">Belichting</div>
+                            <i class="bi bi-lightbulb fs-4 text-warning"></i>
+                        </div>
+                        <div class="text-muted small mt-2">LED PAR, Moving Heads, …</div>
+                        <a href="/catalog" class="stretched-link"></a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-3">
+                <div class="card shadow-sm h-100">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between">
+                            <div class="fw-semibold">Kabels</div>
+                            <i class="bi bi-plug fs-4 text-primary"></i>
+                        </div>
+                        <div class="text-muted small mt-2">XLR, PowerCON, …</div>
+                        <a href="/catalog" class="stretched-link"></a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-3">
+                <div class="card shadow-sm h-100">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between">
+                            <div class="fw-semibold">Controlepanelen</div>
+                            <i class="bi bi-sliders fs-4 text-success"></i>
+                        </div>
+                        <div class="text-muted small mt-2">DMX controllers, consoles, …</div>
+                        <a href="/catalog" class="stretched-link"></a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-3">
+                <div class="card shadow-sm h-100">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between">
+                            <div class="fw-semibold">Podiumelementen</div>
+                            <i class="bi bi-building fs-4 text-secondary"></i>
+                        </div>
+                        <div class="text-muted small mt-2">Truss, podiumplatformen, …</div>
+                        <a href="/catalog" class="stretched-link"></a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- SECTIE: DEMO FLOW -->
+<section class="py-5 bg-white border-top">
+    <div class="container">
+        <div class="row g-4 align-items-center">
+            <div class="col-lg-6">
+                <h2 class="fw-bold mb-2">Demo flow</h2>
+                <p class="text-muted mb-4">
+                    Dit is de flow die je letterlijk kan volgen tijdens je presentatie.
+                </p>
+
+                <ol class="list-group list-group-numbered shadow-sm">
+                    <li class="list-group-item d-flex justify-content-between align-items-start">
+                        <div class="ms-2 me-auto">
+                            <div class="fw-semibold">Open de catalogus</div>
+                            Zoek of filter een product.
+                        </div>
+                        <span class="badge text-bg-primary rounded-pill">1</span>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between align-items-start">
+                        <div class="ms-2 me-auto">
+                            <div class="fw-semibold">Kies datums & voeg toe</div>
+                            Item gaat naar sessie-mandje.
+                        </div>
+                        <span class="badge text-bg-primary rounded-pill">2</span>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between align-items-start">
+                        <div class="ms-2 me-auto">
+                            <div class="fw-semibold">Checkout</div>
+                            Reservations worden aangemaakt en stock daalt.
+                        </div>
+                        <span class="badge text-bg-primary rounded-pill">3</span>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between align-items-start">
+                        <div class="ms-2 me-auto">
+                            <div class="fw-semibold">Mijn leningen → annuleren</div>
+                            Status wordt CANCELED en stock herstelt.
+                        </div>
+                        <span class="badge text-bg-primary rounded-pill">4</span>
+                    </li>
+                </ol>
+            </div>
+
+            <div class="col-lg-6">
+                <div class="alert alert-warning border shadow-sm mb-3">
+                    <div class="d-flex gap-3 align-items-start">
+                        <i class="bi bi-exclamation-triangle fs-4"></i>
+                        <div>
+                            <div class="fw-semibold">POC note</div>
+                            <div class="small">
+                                Geen betalingen — checkout is enkel “bevestigen” en mandje leegmaken.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card shadow-sm">
+                    <div class="card-body">
+                        <div class="fw-semibold mb-2"><i class="bi bi-shield-check me-2"></i>Security highlights</div>
+                        <ul class="small text-muted mb-0">
+                            <li>CSRF token in cookie + header (fetch-compatibel)</li>
+                            <li>BCrypt password hashing</li>
+                            <li>Rate limiting op login (IP + email key)</li>
+                            <li>H2-console ADMIN-only (indien geconfigureerd)</li>
+                        </ul>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- FAQ -->
+<section class="py-5">
+    <div class="container">
+        <div class="row g-3 align-items-end mb-3">
+            <div class="col-lg-8">
+                <h2 class="fw-bold mb-1">FAQ</h2>
+                <div class="text-muted">Snelle antwoorden tijdens je demo of verdediging.</div>
+            </div>
+        </div>
+
+        <div class="accordion shadow-sm" id="faq">
+            <div class="accordion-item">
+                <h2 class="accordion-header">
+                    <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#faq1">
+                        Waarom sessions i.p.v. JWT?
+                    </button>
+                </h2>
+                <div id="faq1" class="accordion-collapse collapse show" data-bs-parent="#faq">
+                    <div class="accordion-body text-muted">
+                        Voor een POC met Thymeleaf + same-origin fetch is session-based auth eenvoudig en betrouwbaar.
+                    </div>
+                </div>
+            </div>
+
+            <div class="accordion-item">
+                <h2 class="accordion-header">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq2">
+                        Waarom CSRF aan?
+                    </button>
+                </h2>
+                <div id="faq2" class="accordion-collapse collapse" data-bs-parent="#faq">
+                    <div class="accordion-body text-muted">
+                        Omdat cookies gebruikt worden voor auth. CSRF voorkomt dat een andere site POST-requests kan doen in jouw naam.
+                    </div>
+                </div>
+            </div>
+
+            <div class="accordion-item">
+                <h2 class="accordion-header">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq3">
+                        Waarom H2 in-memory?
+                    </button>
+                </h2>
+                <div id="faq3" class="accordion-collapse collapse" data-bs-parent="#faq">
+                    <div class="accordion-body text-muted">
+                        Ideaal voor demo/POC: snel opstarten, geen externe DB nodig. Data reset bij restart is ok voor demonstratie.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- FINAL CTA -->
+<section class="py-5 border-top bg-white">
+    <div class="container">
+        <div class="row align-items-center g-3">
+            <div class="col-lg-8">
+                <h2 class="fw-bold mb-1">Klaar om te starten?</h2>
+                <div class="text-muted">Ga naar de catalogus en probeer de volledige flow.</div>
+            </div>
+            <div class="col-lg-4 text-lg-end">
+                <a href="/catalog" class="btn btn-primary btn-lg">
+                    <i class="bi bi-arrow-right me-2"></i>Start nu
+                </a>
+            </div>
+        </div>
+
+        <div class="text-muted small mt-3">
+            <span class="me-2">© Equipment Rental – POC</span>
+            <span class="me-2">•</span>
+            <span>Spring Boot • Spring Security • Thymeleaf • Bootstrap</span>
+        </div>
+    </div>
+</section>
+
+<!-- app.js voor logout/csrf (als je navbar logout button gebruikt) -->
+<script src="/js/app.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

@@ -1,0 +1,14 @@
+.hero {
+    background: radial-gradient(1200px circle at 10% 10%, rgba(13,110,253,.12), transparent 55%),
+    radial-gradient(900px circle at 90% 20%, rgba(25,135,84,.10), transparent 45%);
+}
+
+.dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 999px;
+    margin-top: 7px;
+    background: #0d6efd;
+    flex: 0 0 auto;
+}
+.min-w-0 { min-width: 0; }
