@@ -36,5 +36,15 @@ async function logout() {
     window.location.href = '/login';
 }
 
+document.addEventListener('DOMContentLoaded', () => {
+    const btn = document.getElementById('logoutBtn');
+    if (btn) {
+        btn.addEventListener('click', (e) => {
+            e.preventDefault();
+            logout();
+        });
+    }
+});
+
 // Seed meteen bij pageload (zodat eerste klik nooit 403 is)
 ensureCsrfCookie();

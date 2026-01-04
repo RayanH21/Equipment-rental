@@ -36,8 +36,8 @@ public class SecurityConfig {
                         // publieke API
                         .requestMatchers("/api/products/**").permitAll()
 
-                        // H2 console (POC)
-                        .requestMatchers("/h2-console/**").permitAll()
+                        // H2 console (POC) - alleen admin
+                        .requestMatchers("/h2-console/**").hasRole("ADMIN")
 
                         // protected
                         .requestMatchers("/cart", "/checkout", "/api/cart/**").authenticated()
