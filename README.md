@@ -10,11 +10,11 @@ Proof of concept webapplicatie voor een uitleenplatform binnen een kunstopleidin
 - Productcatalogus met categorieën + zoek/filter
 - Winkelmandje in `HttpSession`
 - Checkout:
-    - maakt `Reservation` records
-    - vermindert product stock
+  - maakt `Reservation` records
+  - vermindert product stock
 - Pagina “Mijn leningen”:
-    - toont actieve reservaties
-    - annuleren zet status op `CANCELED` en herstelt stock
+  - toont actieve reservaties
+  - annuleren zet status op `CANCELED` en herstelt stock
 - CSRF-beveiliging met token in cookie (compatibel met `fetch`)
 - H2-console alleen toegankelijk voor ADMIN (POC)
 
@@ -36,6 +36,7 @@ Proof of concept webapplicatie voor een uitleenplatform binnen een kunstopleidin
 ### Starten
 ```bash
 ./mvnw spring-boot:run
+```
 
 Open de app:
 
@@ -46,11 +47,9 @@ H2 Console
 
 URL: http://localhost:8080/h2-console
 
-Toegang tot de pagina is ADMIN-only.
+Toegang: ADMIN-only
 
 DB connectie (in de H2 Console)
-
-Gebruik:
 
 JDBC URL: jdbc:h2:mem:testdb
 
@@ -66,8 +65,11 @@ Om een admin automatisch te seeden in dev (zonder wachtwoord in code), gebruik a
 (dat bestand wordt best niet gecommit).
 
 Maak bestand:
+
 src/main/resources/application-local.properties
 
+Inhoud:
+```
 spring.datasource.url=jdbc:h2:mem:testdb
 spring.datasource.username=sa
 spring.datasource.password=
@@ -76,19 +78,18 @@ spring.h2.console.path=/h2-console
 
 admin.email=admin@school.be
 admin.password=Admin123!
-
+```
 
 Voeg toe aan .gitignore:
 
 src/main/resources/application-local.properties
 
-
 Activeer profile local:
 
-In application.properties staat:
-
+In application.properties:
+```
 spring.profiles.active=local
-
+```
 Daarna:
 
 login in de app met admin@school.be + jouw admin password
@@ -105,7 +106,7 @@ Ga naar “Mijn leningen” en annuleer een reservatie
 
 (Optioneel) Toon H2-console en laat RESERVATION / PRODUCT tabellen zien
 
-Notes
+### Notes
 
 H2 is in-memory: data verdwijnt bij restart (bewust voor POC).
 
