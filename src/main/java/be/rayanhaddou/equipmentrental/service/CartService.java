@@ -5,6 +5,7 @@ import be.rayanhaddou.equipmentrental.model.CartItem;
 import be.rayanhaddou.equipmentrental.repository.ProductRepository;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.stereotype.Service;
+import java.time.LocalDate;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,22 +28,34 @@ public class CartService {
         List<CartItem> cart = getCart(session);
 
         var product = productRepository.findById(request.getProductId())
-                .orElseThrow(() -> new IllegalArgumentException("Product not found"));
+                .orElseThrow(() -> new IllegalArgumentException("Product niet gevonden"));
 
         if (!product.isActive()) {
-            throw new IllegalArgumentException("Product is not available");
+            throw new IllegalArgumentException("Dit product is niet beschikbaar");
         }
 
         if (request.getQuantity() > product.getQuantity()) {
-            throw new IllegalArgumentException("Not enough stock");
+            throw new IllegalArgumentException("Onvoldoende stock beschikbaar");
         }
+
+        var from = request.getFromDate();
+        var to = request.getToDate();
+
+        if (from.isAfter(to)) {
+            throw new IllegalArgumentException("De 'van'-datum mag niet na de 'tot'-datum liggen");
+        }
+
+LocalDate today = LocalDate.now();
+if (from.isBefore(today)) {
+    throw new IllegalArgumentException("De 'van'-datum mag niet in het verleden liggen");
+ }
 
         CartItem item = new CartItem(
                 request.getProductId(),
-                product.getName(), // ✅ nu gevuld
+                product.getName(),
                 request.getQuantity(),
-                request.getFromDate(),
-                request.getToDate()
+                from,
+                to
         );
 
         cart.add(item);
