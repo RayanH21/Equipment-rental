@@ -25,14 +25,6 @@
 
 <script src="/js/app.js"></script>
 <script>
-    // logout
-    const logoutBtn = document.getElementById('logoutBtn');
-    if (logoutBtn) {
-        logoutBtn.addEventListener('click', async () => {
-            await logout();
-        });
-    }
-
     function renderEmpty() {
         document.getElementById('content').innerHTML = `
           <div class="alert alert-secondary">

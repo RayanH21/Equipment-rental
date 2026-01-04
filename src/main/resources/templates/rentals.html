@@ -124,6 +124,15 @@
             return;
         }
 
+        if (!res.ok) {
+            document.getElementById('content').innerHTML = `
+      <div class="alert alert-danger">
+        Laden mislukt: ${res.status}
+      </div>
+    `;
+            return;
+        }
+
         const data = await res.json();
 
         if (!data || data.length === 0) {
