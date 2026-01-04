@@ -121,8 +121,11 @@ public class ReservationService {
                 .orElseThrow(() -> new IllegalArgumentException("Reservation not found"));
 
         if (!r.getUser().getId().equals(user.getId())) {
-            throw new IllegalArgumentException("Not your reservation");
+            throw new org.springframework.security.access.AccessDeniedException(
+                    "Je mag deze reservatie niet annuleren"
+            );
         }
+
 
         if (r.getStatus() == ReservationStatus.CANCELED) {
             return;

@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="nl"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<body>
+
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark" th:fragment="navbar">
+    <div class="container">
+        <a class="navbar-brand fw-semibold" href="/">Equipment Rental</a>
+
+        <div class="d-flex gap-2">
+            <!-- Altijd zichtbaar -->
+            <a class="btn btn-outline-light btn-sm" href="/">Catalogus</a>
+
+            <!-- Alleen als je NIET ingelogd bent -->
+            <span sec:authorize="isAnonymous()">
+        <a class="btn btn-outline-light btn-sm" href="/login">Login</a>
+        <a class="btn btn-outline-light btn-sm" href="/register">Registreren</a>
+      </span>
+
+            <!-- Alleen als je WEL ingelogd bent -->
+            <span sec:authorize="isAuthenticated()">
+        <a class="btn btn-outline-light btn-sm" href="/cart">Mandje</a>
+        <a class="btn btn-outline-light btn-sm" href="/rentals">Mijn leningen</a>
+        <button class="btn btn-warning btn-sm" id="logoutBtn" type="button">Logout</button>
+      </span>
+        </div>
+    </div>
+</nav>
+
+</body>
+</html>
