@@ -96,18 +96,22 @@ login in de app met admin@school.be + jouw admin password
 
 ga naar /h2-console
 
-Demo flow
-
-Ga naar catalogus en voeg items toe aan mandje (met datum + aantal)
-
-Ga naar mandje en doe checkout
-
-Ga naar “Mijn leningen” en annuleer een reservatie
-
-(Optioneel) Toon H2-console en laat RESERVATION / PRODUCT tabellen zien
 
 ### Notes
 
 H2 is in-memory: data verdwijnt bij restart (bewust voor POC).
 
 Geen betalingen in deze POC.
+
+### Referenties
+- Spring Boot Reference Documentation — https://docs.spring.io/spring-boot/docs/current/reference/html/
+- Spring Security Reference — https://docs.spring.io/spring-security/reference/
+- CSRF in Spring Security — https://docs.spring.io/spring-security/reference/servlet/exploits/csrf.html
+- CookieCsrfTokenRepository (Spring Security Javadoc) — https://docs.spring.io/spring-security/site/docs/current/api/org/springframework/security/web/csrf/CookieCsrfTokenRepository.html
+- Thymeleaf + Spring Security extras (sec:authorize) — https://www.thymeleaf.org/doc/articles/springsecurity.html
+- Spring Data JPA Reference — https://docs.spring.io/spring-data/jpa/docs/current/reference/html/
+- Jakarta Bean Validation (Hibernate Validator docs) — https://hibernate.org/validator/documentation/
+- H2 Database Engine (Console & JDBC URL uitleg) — https://www.h2database.com/html/main.html
+- BCryptPasswordEncoder (Spring Security Javadoc) — https://docs.spring.io/spring-security/site/docs/current/api/org/springframework/security/crypto/bcrypt/BCryptPasswordEncoder.html
+- MDN Web Docs — Fetch API — https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API
+- MDN Web Docs — Cookies — https://developer.mozilla.org/en-US/docs/Web/HTTP/Cookies

@@ -8,13 +8,13 @@ let csrfInitPromise = null;
 async function ensureCsrfCookie() {
     if (getCookie('XSRF-TOKEN')) return;
 
-    // voorkom race: maar 1 init-call tegelijk
     if (!csrfInitPromise) {
         csrfInitPromise = fetch('/api/csrf', {
             credentials: 'same-origin',
             cache: 'no-store'
         }).finally(() => {
-            // laat de promise staan; cookie blijft toch geldig voor de sessie
+            // reset zodat je later opnieuw kan proberen als het ooit faalt
+            csrfInitPromise = null;
         });
     }
 
@@ -28,7 +28,20 @@ async function csrfFetch(url, options = {}) {
     const headers = options.headers ? { ...options.headers } : {};
     if (token) headers['X-XSRF-TOKEN'] = token;
 
-    return fetch(url, { ...options, headers, credentials: 'same-origin' });
+    let resp = await fetch(url, { ...options, headers, credentials: 'same-origin' });
+
+    // Als 403: forceer cookie-init opnieuw en retry 1x
+    if (resp.status === 403) {
+        await ensureCsrfCookie();
+
+        const token2 = getCookie('XSRF-TOKEN');
+        const headers2 = options.headers ? { ...options.headers } : {};
+        if (token2) headers2['X-XSRF-TOKEN'] = token2;
+
+        resp = await fetch(url, { ...options, headers: headers2, credentials: 'same-origin' });
+    }
+
+    return resp;
 }
 
 async function logout() {
